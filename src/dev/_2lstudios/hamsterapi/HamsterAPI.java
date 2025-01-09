@@ -3,6 +3,7 @@ package dev._2lstudios.hamsterapi;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.Properties;
 
 import org.bukkit.Server;
@@ -36,8 +37,7 @@ public class HamsterAPI extends JavaPlugin {
 	public static String getVersion(Server server) {
 		String packageName = server.getClass().getPackage().getName();
 		String[] packageSplit = packageName.split("\\.");
-		String version = packageSplit.length > 3 ? packageSplit[3] : null;
-		return version;
+        return packageSplit.length > 3 ? packageSplit[3] : null;
 	}
 
 	private void initialize() {
@@ -58,7 +58,7 @@ public class HamsterAPI extends JavaPlugin {
 		final File propertiesFile = new File("./server.properties");
 		final Properties properties = new Properties();
 
-		try (final InputStream inputStream = new FileInputStream(propertiesFile)) {
+		try (final InputStream inputStream = Files.newInputStream(propertiesFile.toPath())) {
 			properties.load(inputStream);
 		} catch (final Exception e) {
 			e.printStackTrace();
@@ -88,11 +88,16 @@ public class HamsterAPI extends JavaPlugin {
 		pluginManager.registerEvents(new PlayerJoinListener(this), this);
 		pluginManager.registerEvents(new PlayerQuitListener(hamsterPlayerManager), this);
 
-		for (final Player player : server.getOnlinePlayers()) {
-			final HamsterPlayer hamsterPlayer = this.hamsterPlayerManager.add(player);
-
-			hamsterPlayer.tryInject();
-		}
+		schedulePlayerInjection();
+	}
+	private void schedulePlayerInjection() {
+		getServer().getScheduler().runTaskLaterAsynchronously(this, () -> {
+			final Server server = getServer();
+			for (final Player player : server.getOnlinePlayers()) {
+				final HamsterPlayer hamsterPlayer = this.hamsterPlayerManager.add(player);
+					hamsterPlayer.tryInject();
+			}
+		}, 20L);
 	}
 
 	@Override
