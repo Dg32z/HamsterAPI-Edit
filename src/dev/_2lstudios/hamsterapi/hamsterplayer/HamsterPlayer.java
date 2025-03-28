@@ -58,7 +58,7 @@ public class HamsterPlayer {
 	}
 
 	public void sendActionbarPacketNew(final String text) throws IllegalAccessException, IllegalArgumentException,
-			InvocationTargetException, InstantiationException, NoSuchMethodException, SecurityException {
+            SecurityException {
 		try {
 			final Reflection reflection = hamsterAPI.getReflection();
 			final Object chatAction = toChatBaseComponent.invoke(null, "{ \"text\":\"" + text + "\" }");

@@ -95,7 +95,9 @@ public class HamsterAPI extends JavaPlugin {
 			final Server server = getServer();
 			for (final Player player : server.getOnlinePlayers()) {
 				final HamsterPlayer hamsterPlayer = this.hamsterPlayerManager.add(player);
+				if (this.hamsterPlayerManager.get(player) == null) {
 					hamsterPlayer.tryInject();
+				}
 			}
 		}, 20L);
 	}
